@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('blog.urls')),
     path('programming/',programming_views.authors,name='authors'),
     path('framework/',programming_views.framework,name='framework'),
+    path('download/',programming_views.download_csv,name='download_csv'),
     path('budget/',include('budget.urls')),
     path('blog/',include('blog.urls')),
     path('admin/', admin.site.urls),
