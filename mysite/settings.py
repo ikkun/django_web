@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'blog.apps.BlogConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
+    'secmgr',
     'tinymce',
     'crispy_forms',
     'rest_framework',

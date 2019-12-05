@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 from users import views as user_views
 from programming import views as programming_views
 from core import views as core_views
+from secmgr import views as secmgr_views
 
 urlpatterns = [
     path('', include('blog.urls')),
@@ -38,11 +39,16 @@ urlpatterns = [
     path('blog-profile/',user_views.profile,name='profile'),
     path('blog-login/',auth_views.LoginView.as_view(template_name='users/login.html'),name='login'),
     path('blog-logout/',auth_views.LogoutView.as_view(template_name='users/logout.html'),name='logout'),
-    path('core/',core_views.PostView.as_view(),name='test'),
+    # path('core/',core_views.PostView.as_vie
+    # w(),name='test'),
     path('core/create/',core_views.PostCreateView.as_view(),name='rest-create'),
     path('core/list-create/',core_views.PostCreateView.as_view(),name='rest-listcreate'),
     path('api/token/', obtain_auth_token, name='obtain-token'),
     path('tinymce',include('tinymce.urls')),
+    path('secmgr/taskscan/',secmgr_views.ScanScheduleView.as_view(),name='secmgr-taskscan'),
+    path('secmgr/taskscan/create/',secmgr_views.CreateScanTask.as_view(), name='secmgr-taskscan_create'),
+    path('secmgr/taskscan/update/',secmgr_views.UpdateScanTask.as_view(), name='secmgr-taskscan_update'),
+    path('secmgr/taskscan/delete/',secmgr_views.DeleteScanTask.as_view(), name='secmgr-taskscan_delete'),
 ]
 
 if settings.DEBUG:
