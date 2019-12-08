@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView,View
 from django.http import JsonResponse
+from rest_framework import viewsets,permissions
+from .serializers import ScanTasksSerializer
 from .models import ScanSchedule
 
 class ScanScheduleView(TemplateView):
@@ -56,3 +58,9 @@ class UpdateScanTask(View):
             'task': task
         }
         return JsonResponse(data)
+
+##Rest api
+class ScanScheduleViewAPI(viewsets.ModelViewSet):
+    queryset = ScanSchedule.objects.all()
+    serializer_class = ScanTasksSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

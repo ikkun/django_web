@@ -1,23 +1,10 @@
-"""mysite URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path,include
 
 from rest_framework.authtoken.views import obtain_auth_token
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -43,12 +30,16 @@ urlpatterns = [
     # w(),name='test'),
     path('core/create/',core_views.PostCreateView.as_view(),name='rest-create'),
     path('core/list-create/',core_views.PostCreateView.as_view(),name='rest-listcreate'),
-    path('api/token/', obtain_auth_token, name='obtain-token'),
+    # path('api/token/', obtain_auth_token, name='obtain-token'),
     path('tinymce',include('tinymce.urls')),
     path('secmgr/taskscan/',secmgr_views.ScanScheduleView.as_view(),name='secmgr-taskscan'),
     path('secmgr/taskscan/create/',secmgr_views.CreateScanTask.as_view(), name='secmgr-taskscan_create'),
     path('secmgr/taskscan/update/',secmgr_views.UpdateScanTask.as_view(), name='secmgr-taskscan_update'),
     path('secmgr/taskscan/delete/',secmgr_views.DeleteScanTask.as_view(), name='secmgr-taskscan_delete'),
+    path('secmgr_api/',include('secmgr.urls')),
+    path('api-auth/',include('rest_framework.urls')),
+    path('api/token/',TokenObtainPairView.as_view()),
+    path('api/token/refresh/',TokenRefreshView.as_view()),
 ]
 
 if settings.DEBUG:
