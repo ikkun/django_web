@@ -35,3 +35,11 @@
   color: whitesmoke;
   font-size: 11.84px;
 }
+
+.bg-isIncident {
+  background-color: coral;
+}
+
+.bg-notIncident {
+  background-color: greenyellow;
+}

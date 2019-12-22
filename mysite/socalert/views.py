@@ -67,6 +67,23 @@ class Update_isIncident(View):
         }
         return JsonResponse(data)
 
+class Update_Memo(View):
+    def get(self,request):
+        id1 = request.GET.get('id',None)
+        comment1 = request.GET.get('comment',None)    
+
+        obj = Event_alert.objects.get(id=id1)
+        obj.comment = comment1
+        
+        obj.save()
+
+        event = {'id':obj.id}
+
+        data = {
+            'event': event
+        }
+        return JsonResponse(data)
+
 ###Rest api
 class Event_alertViewAPI(viewsets.ModelViewSet):
     queryset = Event_alert.objects.all()

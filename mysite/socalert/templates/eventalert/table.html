@@ -1,7 +1,5 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
-
-
 {% block content %}
 {% load i18n %}
     <ul class="nav nav-tabs">
@@ -31,6 +29,7 @@
                     {% trans "Contact" as t_contact %}
                     {% trans "Incident" as t_isincident %}
                     {% trans "Acknowledge" as t_acknowledge %}
+                    {% trans "Memo" as t_comment %}
                     <tr>
                         {% include './column.html' with name=t_date field='date' %}
                         {% include './column.html' with name=t_type field='type' %}
@@ -40,11 +39,12 @@
                         {% include './column.html' with name=t_contact field='contact' %}
                         {% include './column.html' with name=t_isincident field='isincident' %}
                         {% include './column.html' with name=t_acknowledge field='acknowledge' %}
+                        {% include './column.html' with name=t_comment field='comment' %}
                     </tr>
             </thead>
             <body>
                 {% for event in events %}
-                    <tr>
+                    <tr id="event-{{event.id}}" {% if event.is_incident == 1 %} class="bg-isIncident" {% elif event.is_incident == 2 %} class="bg-notIncident" {% endif %}>
                         <td>{{ event.created_at|date:"F d, Y H:i"}}</td>
                         <td>{{ event.types }}</td>
                         <td>{{ event.title }}</td>
@@ -55,7 +55,37 @@
                             <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 2 %} checked {% endif %} value="2"> ไม่ใช่
                             
                           </form></td>
-                        <td>{% if event.ackby.first_name %}{{ event.ackby.first_name }}{% else %}{{ event.ackby.username}}{% endif %}</td>
+                        <td>
+                            {% if event.is_incident > 0 %}
+                                <img class="rounded-circle" src="{{ event.ackby.profile.image.url }}" height="35" width="35"
+                                 title="{% if event.ackby.first_name %}
+                                            {{ event.ackby.first_name }}
+                                        {% else %}
+                                            {{ event.ackby.username}}
+                                        {% endif %}"
+                                >
+                            {% endif %}
+                            
+                            
+                        </td>
+                        <td style='cursor:pointer' data-toggle="modal" data-target="#myModal" onClick="editMemo({{event.id}})">
+                            
+                            {% if event.comment %}                               
+                                
+                                
+                                <i class="fas fa-book"  data-toggle="tooltip" data-placement="top" title="{{ event.comment }}"></i>
+                                <span class='eventComment' style='display:none' >{{ event.comment }}</span>
+                                
+                            {% else %}
+                                
+                                <i class="fas fa-pen" ></i>                              
+                                <span class='eventComment' style='display:none'></span>
+                                
+                                
+                            {% endif %}  
+                                <!-- <button class="btn btn-success form-control"  data-toggle="modal" data-target="#myModal" >กด</button> -->
+                            
+                        </td>
                     </tr>
                 {% endfor %}
             </body>
@@ -84,11 +114,30 @@
     </div>
     {% else %}
 	<div class='nothing_to_show'>{% trans "No incidents to show." %}</div>   
-            
-        <!-- {% for event in events %}
-            {{ event.ackby.first_name }}<br>
-        {% endfor %} -->
     {% endif %}
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Memo</h4>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                
+                </div>
+                <form id="memo_event" action="">
+                    <div class="modal-body">
+                        <input class="form-control" id="form-id" type="hidden" name="formId"/>
+                        <label for="app">บันทึก</label>
+                        <textarea class="form-control" id="form-comment" rows="5" name="formComment"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" >บันทึก</button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 {% block javascript %}
 <script>
@@ -119,5 +168,50 @@
         // $(".sex:checked").val()
         // alert($('input[name='+event_id+']').val());
     }
+
+    
+    function editMemo(id) {
+        
+        if (id){
+            tr_id = "#event-" + id;
+            eventcomment=$(tr_id).find(".eventComment").text();
+            $('#form-id').val(id);
+            $('#form-comment').val(eventcomment);            
+            
+        }
+    }
+
+    $("form#memo_event").submit(function() {
+    
+        var idInput = $('input[name="formId"]').val().trim();
+    
+        var commentInput = $('textarea[name="formComment"]').val().trim();
+        
+        
+        
+        if (idInput) {
+            
+            // Create Ajax Call
+            // console.log(commentInput);
+            $.ajax({
+                type:'GET',
+                url: '{% url "socalert-memo_update" %}',
+                data: {
+                    'id': idInput,
+                    'comment': commentInput                    
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.event) {
+                        window.location.reload();
+                    }
+                }
+            });
+        } else {
+            alert("All fields must have a valid value.");
+        }
+        $('form#memo_event').trigger("reset");
+        return false;
+    });
 </script>
 {% endblock javascript %}

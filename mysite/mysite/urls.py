@@ -44,6 +44,7 @@ urlpatterns = [
     path('socalert/eventalert/tab_ack/',socalert_views.Event_AlertView_Ack.as_view(), name='socalert-eventack'),
     path('socalert/eventalert/tab_all/',socalert_views.Event_AlertView_All.as_view(), name='socalert-eventall'),
     path('socalert/eventalert/ack_update/',socalert_views.Update_isIncident.as_view(),name='socalert-ack_update'),
+    path('socalert/eventalert/memo_update/',socalert_views.Update_Memo.as_view(),name='socalert-memo_update'),
     path('api-auth/',include('rest_framework.urls')),
     path('api/token/',TokenObtainPairView.as_view()),
     path('api/token/refresh/',TokenRefreshView.as_view()),
