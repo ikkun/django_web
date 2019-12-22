@@ -1,0 +1,12 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <h1>Hello my first app</h1>
+    <br>
+    <p>Welcome to yours first app</p>
+    {% for pa in programming_authors%}
+        {{pa.programming_languages}}
+        <br>
+    {% endfor %}
+{% endblock content %}

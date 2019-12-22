@@ -1,0 +1,32 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <h1>Hello my Framework</h1>
+    <br>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+            <th scope="col">Framework Name</th>
+            <th scope="col">Framework Type</th>
+            <th scope="col">Programming Language</th>            
+            </tr>
+        </thead>
+        <tbody>
+        {% for fw in frame_obj %}
+            <tr>
+                <th scope="row">{{fw.framework_name}}</th>
+                <td>{{fw.framework_type}}</td>
+                <td>{{fw.programming_authors.programming_languages}}</td>
+                
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        <a href="{% url 'download_csv' %}">Download CSV</a>
+    <!-- <p>Welcome to yours first app</p>
+    {% for pa in programming_authors%}
+        {{pa.programming_languages}}
+        <br>
+    {% endfor %} -->
+{% endblock content %}

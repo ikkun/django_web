@@ -1,0 +1,123 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+{% load i18n %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventalert' %} active {% endif %}" href="{% url 'socalert-eventalert' %}" href="{% url 'socalert-eventalert' %}">{%  trans "Open" %}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventack' %} active {% endif %}" href="{% url 'socalert-eventack' %}">{%  trans "Acknowledge" %}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventall' %} active {% endif %}" href="{% url 'socalert-eventall' %}">{%  trans "ALL" %}</a>
+        </li>
+        
+    </ul>
+    {% if events %}
+    
+    <div class="container">
+        
+      
+        <table class='table table-hover table-condensed'>
+			<thead>
+                    {% trans "Date" as t_date %}
+                    {% trans "Type" as t_type %}
+                    {% trans "Event" as t_event %}
+                    {% trans "Description" as t_desc %}                
+                    {% trans "Severity" as t_severity %}
+                    {% trans "Contact" as t_contact %}
+                    {% trans "Incident" as t_isincident %}
+                    {% trans "Acknowledge" as t_acknowledge %}
+                    <tr>
+                        {% include './column.html' with name=t_date field='date' %}
+                        {% include './column.html' with name=t_type field='type' %}
+                        {% include './column.html' with name=t_event field='event' %}
+                        <!-- {% include './column.html' with name=t_desc field='description' %} -->
+                        {% include './column.html' with name=t_severity field='severity' %}
+                        {% include './column.html' with name=t_contact field='contact' %}
+                        {% include './column.html' with name=t_isincident field='isincident' %}
+                        {% include './column.html' with name=t_acknowledge field='acknowledge' %}
+                    </tr>
+            </thead>
+            <body>
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event.created_at|date:"F d, Y H:i"}}</td>
+                        <td>{{ event.types }}</td>
+                        <td>{{ event.title }}</td>
+                        <td><span class='badge threatcon-{{ event.severity }}'>{{ event.severity }}</span></td>
+                        <td>{{ event.contact }}</td>
+                        <td><form action="" onclick="update_ack({{event.id}},'isincident_{{ event.id }}');">
+                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 1 %} checked {% endif %} value="1">ใช่ &nbsp;
+                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 2 %} checked {% endif %} value="2"> ไม่ใช่
+                            
+                          </form></td>
+                        <td>{% if event.ackby.first_name %}{{ event.ackby.first_name }}{% else %}{{ event.ackby.username}}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </body>
+        </table>
+        {% if is_paginated %}
+
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+  
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+  
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+  
+      {% endif %} 
+    </div>
+    {% else %}
+	<div class='nothing_to_show'>{% trans "No incidents to show." %}</div>   
+            
+        <!-- {% for event in events %}
+            {{ event.ackby.first_name }}<br>
+        {% endfor %} -->
+    {% endif %}
+{% endblock content %}
+{% block javascript %}
+<script>
+    function update_ack(id,event_id){
+        // alert(event_id);
+        var radioValue = $("input[name='"+event_id+"']:checked"). val();
+        if(typeof radioValue !== 'undefined'){
+            console.log(id,radioValue);
+            // Create Ajax Call
+            $.ajax({
+                type:'GET',
+                url: '{% url "socalert-ack_update" %}',
+                data: {
+                    'id': id,
+                    'isincident': radioValue
+                    
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.event) {
+                        // updateToTaskTable(data.task);
+                        console.log('updatee success.');
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+        // $(".sex:checked").val()
+        // alert($('input[name='+event_id+']').val());
+    }
+</script>
+{% endblock javascript %}
