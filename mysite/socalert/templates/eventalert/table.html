@@ -1,13 +1,28 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
+{% block customcss %}
+    <link rel="stylesheet" type="text/css" href="{% static 'custom_css/socalert.css' %}">
+{% endblock customcss%}
+
 {% block content %}
 {% load i18n %}
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventalert' %} active {% endif %}" href="{% url 'socalert-eventalert' %}" href="{% url 'socalert-eventalert' %}">{%  trans "Open" %}</a>
+            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventalert' %} active {% endif %}" href="{% url 'socalert-eventalert' %}" href="{% url 'socalert-eventalert' %}">
+                {%  trans "Open" %} {% if eventopen > 0 %} <label class='nav-totalrec' style='background-color:coral;'>{{eventopen}}</label>{% endif %}
+
+            </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventack' %} active {% endif %}" href="{% url 'socalert-eventack' %}">{%  trans "Acknowledge" %}</a>
+                <a class="nav-link {% if request.resolver_match.view_name == 'socalert-incidents' %} active {% endif %}" href="{% url 'socalert-incidents' %}">
+                    {%  trans "Incidents" %} {% if eventincident > 0 %} <label class='nav-totalrec' style='background-color:olivedrab;'>{{eventincident}}</label>{% endif %}
+                </a>
+            </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventack' %} active {% endif %}" href="{% url 'socalert-eventack' %}">
+                {%  trans "Acknowledge" %}
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.view_name == 'socalert-eventall' %} active {% endif %}" href="{% url 'socalert-eventall' %}">{%  trans "ALL" %}</a>
@@ -28,7 +43,9 @@
                     {% trans "Severity" as t_severity %}
                     {% trans "Contact" as t_contact %}
                     {% trans "Incident" as t_isincident %}
-                    {% trans "Ack By" as t_acknowledge %}
+                    {% trans "Analyse By" as t_analyst %}
+                    {% trans "Closed" as t_closed %}
+                    {% trans "Closed By" as t_closedby %}
                     {% trans "Memo" as t_comment %}
                     <tr>
                         {% include './column.html' with name=t_date field='date' %}
@@ -38,37 +55,50 @@
                         {% include './column.html' with name=t_severity field='severity' %}
                         {% include './column.html' with name=t_contact field='contact' %}
                         {% include './column.html' with name=t_isincident field='isincident' %}
-                        {% include './column.html' with name=t_acknowledge field='acknowledge' %}
+                        {% include './column.html' with name=t_analyst field='analyst' %}
+                        {% include './column.html' with name=t_closed field='closed' %}
+                        {% include './column.html' with name=t_closedby field='closedby' %}
                         {% include './column.html' with name=t_comment field='comment' %}
                     </tr>
             </thead>
-            <body>
+            <body style='font-size: 8pt;'>
                 {% for event in events %}
                     <tr id="event-{{event.id}}" {% if event.is_incident == 1 %} class="bg-isIncident" {% elif event.is_incident == 2 %} class="bg-notIncident" {% endif %}>
                         <td>{{ event.created_at|date:"F d, Y H:i"}}</td>
-                        <td>{{ event.types }}</td>
+                        <td>{{ event.get_types_display }}</td>
                         <td>{{ event.title }}</td>
-                        <td><span class='badge threatcon-{{ event.severity }}'>{{ event.severity }}</span></td>
+                        <td align='center'><span class='badge threatcon-{{ event.severity }}'>{{ event.severity }}</span></td>
                         <td>{{ event.contact }}</td>
                         <td><form action="" onclick="update_ack({{event.id}},'isincident_{{ event.id }}');">
-                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 1 %} checked {% endif %} value="1">ใช่ &nbsp;
-                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 2 %} checked {% endif %} value="2"> ไม่ใช่
+                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 1 %} checked {% endif %} value="1"> ใช่<br>
+                            <input type="radio" name="isincident_{{ event.id }}" {% if event.is_incident == 2 %} checked {% endif %} value="2"> ไม่
                             
-                          </form></td>
-                        <td>
-                            {% if event.is_incident > 0 %}
-                                <img class="rounded-circle" src="{{ event.ackby.profile.image.url }}" height="35" width="35"
-                                 title="{% if event.ackby.first_name %}
-                                            {{ event.ackby.first_name }}
-                                        {% else %}
-                                            {{ event.ackby.username}}
-                                        {% endif %}"
-                                >
-                            {% endif %}
-                            
-                            
+                          </form>
                         </td>
-                        <td style='cursor:pointer' data-toggle="modal" data-target="#myModal" onClick="editMemo({{event.id}})">
+                        <td align='center'>
+                            {% if event.is_incident > 0 %}
+                                <img class="rounded-circle" src="{{ event.analyse_by.profile.image.url }}" height="20" width="20"
+                                 title="{% if event.analyse_by.first_name %}{{ event.analyse_by.first_name }}
+                                        {% else %}{{ event.analyse_by.username}}{% endif %}"
+                                >
+                            {% endif %}      
+                        </td>
+                        <td>
+                        {% if event.is_incident > 0 %}    
+                            <form action="" {% if event.is_closed == 0 %} onclick="closed_event({{event.id}},'isclosed_{{ event.id }}');" {% endif %} >
+                                <input type="radio" name="isclosed_{{ event.id }}" {% if event.is_closed == 1 %} checked {% endif %} value="1">ใช่ &nbsp;
+                             </form>
+                        {% endif %}
+                        </td>
+                        <td align='center'>
+                                {% if event.is_closed == 1 %}
+                                    <img class="rounded-circle" src="{{ event.closed_by.profile.image.url }}" height="20" width="20"
+                                     title="{% if event.closed_by.first_name %}{{ event.closed_by.first_name }}
+                                            {% else %}{{ event.closed_by.username}}{% endif %}"
+                                    >
+                                {% endif %}      
+                            </td>
+                        <td style='cursor:pointer' data-toggle="modal" data-target="#myModal" onClick="editMemo({{event.id}})" align='center'>
                             
                             {% if event.comment %}                               
                                 
@@ -164,9 +194,33 @@
                     }
                 }
             });
-        }
-        // $(".sex:checked").val()
-        // alert($('input[name='+event_id+']').val());
+        }        
+    }
+
+    function closed_event(id,event_id){
+        // alert(event_id);
+        var radioValue = $("input[name='"+event_id+"']:checked").val();
+        if(typeof radioValue !== 'undefined'){
+            console.log(id,radioValue);
+            // Create Ajax Call
+            $.ajax({
+                type:'GET',
+                url: '{% url "socalert-closed_event" %}',
+                data: {
+                    'id': id,
+                    'isclosed': radioValue
+                    
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.event) {
+                        // updateToTaskTable(data.task);
+                        console.log('updatee success.');
+                        window.location.reload();
+                    }
+                }
+            });
+        }        
     }
 
     
@@ -213,5 +267,13 @@
         $('form#memo_event').trigger("reset");
         return false;
     });
+    function refresh(){
+        window.location.reload();
+        
+    }
+    $(document).ready(function($){
+        
+        setInterval("refresh()",300000);
+    })
 </script>
 {% endblock javascript %}

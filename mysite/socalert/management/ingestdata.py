@@ -8,6 +8,8 @@ url=r"http://127.0.0.1:7050/api/token/"
 rs=requests.post(url,data=dataAuthen,headers=headers).json()
 token = rs['access']
 
+rs=requests.get("http://127.0.0.1:7050/socalert_api/geteventrule?rule=A2")
+print(rs.json())
 
 data_ingest={
     'types':'Sec',

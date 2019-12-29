@@ -39,12 +39,22 @@ urlpatterns = [
     path('secmgr/taskscan/update/',secmgr_views.UpdateScanTask.as_view(), name='secmgr-taskscan_update'),
     path('secmgr/taskscan/delete/',secmgr_views.DeleteScanTask.as_view(), name='secmgr-taskscan_delete'),
     path('secmgr_api/',include('secmgr.urls')),
-    path('socalert_api/',include('socalert.urls')),
+
+    ###eventalert
+    path('socalert_api/',include('socalert.urls')),    
     path('socalert/eventalert/',socalert_views.Event_AlertView.as_view(), name='socalert-eventalert'),
     path('socalert/eventalert/tab_ack/',socalert_views.Event_AlertView_Ack.as_view(), name='socalert-eventack'),
     path('socalert/eventalert/tab_all/',socalert_views.Event_AlertView_All.as_view(), name='socalert-eventall'),
+    path('socalert/eventalert/tab_incidents/',socalert_views.Event_IncidentsView.as_view(),name='socalert-incidents'),
     path('socalert/eventalert/ack_update/',socalert_views.Update_isIncident.as_view(),name='socalert-ack_update'),
     path('socalert/eventalert/memo_update/',socalert_views.Update_Memo.as_view(),name='socalert-memo_update'),
+    path('socalert/eventalert/close_event/',socalert_views.Closed_Event.as_view(),name='socalert-closed_event'),
+    
+    ###eventrule
+    path('socalert/eventrule/',socalert_views.Event_RulesView.as_view(), name='socalert-eventrule'),
+    path('socalert/eventrule/new/',socalert_views.Event_Rule_CreateView.as_view(),name='socalert-createrule'),
+    path('socalert/eventrule/<int:pk>/update/', socalert_views.Event_Rule_UpdateView.as_view(), name='socalert-ruleupdate'),
+
     path('api-auth/',include('rest_framework.urls')),
     path('api/token/',TokenObtainPairView.as_view()),
     path('api/token/refresh/',TokenRefreshView.as_view()),

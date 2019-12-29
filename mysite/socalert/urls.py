@@ -4,6 +4,8 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('eventalert',views.Event_alertViewAPI)
+router.register('geteventrule',views.Event_getRuleViewAPI)
+
 
 
 urlpatterns = [

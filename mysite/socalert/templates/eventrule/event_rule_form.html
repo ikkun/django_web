@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<a href="{% url 'socalert-eventrule' %}" class="btn btn-secondary active" role="button" aria-pressed="true">รายการ Rule</a><br>
+    <div class="content-section">
+        {{ get_absolute_url }}
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Rule</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">ตกลง</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

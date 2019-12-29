@@ -1,0 +1,97 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block customcss %}
+    <link rel="stylesheet" type="text/css" href="{% static 'custom_css/socalert.css' %}">
+{% endblock customcss%}
+
+{% block content %}
+{% load i18n %}
+<div class="container">
+    <a href="{% url 'socalert-createrule' %}" class="btn btn-primary  active" role="button" aria-pressed="true">สร้าง Rule</a>
+    <br>
+    {% if rules %}      
+        <table class='table table-hover table-condensed'>
+			<thead>
+                    {% trans "Rule" as t_rule %}
+                    {% trans "Service" as t_service %}
+                    {% trans "Title" as t_title %}
+                    {% trans "Impact" as t_impact %}                
+                    {% trans "Urgency" as t_urgency %}
+                    {% trans "Contact" as t_contact %}
+                    {% trans "Howto" as t_howto %}
+                    {% trans "Create at" as t_createat %}
+                    {% trans "Create by" as t_createby %}
+                    {% trans "Update at" as t_updateat %}
+                    {% trans "Update by" as t_updateby %}
+                    {% trans "Edit" as t_edit %}
+                    <tr>
+                        {% include './column.html' with name=t_rule field='rule' %}
+                        {% include './column.html' with name=t_service field='service' %}
+                        {% include './column.html' with name=t_title field='title' %}
+                        {% include './column.html' with name=t_impact field='impact' %}
+                        {% include './column.html' with name=t_urgency field='urgency' %}
+                        {% include './column.html' with name=t_createby field='createby' %}
+                        {% include './column.html' with name=t_updateby field='updateby' %}
+                        <th>Edit</th>
+                    </tr>
+            </thead>
+            <body style='font-size: 8pt;'>
+                {% for rule in rules %}
+                <tr>
+                    <td>{{ rule.rule }}</td>
+                    <td>{{ rule.service }}</td>
+                    <td>{{ rule.title }}</td>
+                    <td>{{ rule.get_impact_display }}</td>
+                    <td>{{ rule.get_urgency_display }}</td>
+                    <td align='center'><img class="rounded-circle" src="{{ rule.created_by.profile.image.url }}" height="20" width="20"
+                        title="{% if rule.created_by.first_name %}{{ rule.created_by.first_name }}
+                               {% else %}{{ rule.created_by.username}}{% endif %}"
+                       ></td>
+
+                    <td align='center'><img class="rounded-circle" src="{{ rule.updated_by.profile.image.url }}" height="20" width="20"
+                    title="{% if rule.updated_by.first_name %}{{ rule.updated_by.first_name }}
+                            {% else %}{{ rule.updated_by.username}}{% endif %}"
+                    ></td>
+                    <td align='center'>
+                        <a href="{% url 'socalert-ruleupdate' rule.id %}">                          
+                            <i class="fas fa-pen" ></i>                              
+                            <span class='eventComment' style='display:none'></span>
+                        </a>                         
+                        
+                    </td>
+                </tr>   
+                {% endfor %}
+            </body>
+            
+        </table>
+        {% if is_paginated %}
+
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+  
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+  
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+  
+      {% endif %} 
+    </div>
+    {% else %}
+	<div class='nothing_to_show'>{% trans "No rule to show." %}</div>   
+    {% endif %}
+    
+{% endblock content %}
+{% block javascript %}
+
+{% endblock javascript %}
