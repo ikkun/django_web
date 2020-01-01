@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
 from .models import Event_alert,Event_rule
 
 # class Event_alertSerializer(serializers.HyperlinkedModelSerializer):
@@ -24,6 +25,7 @@ class Event_alertSerializer(serializers.ModelSerializer):
         fields = ('types','title','description','severity','contact')
 
 class Event_ruleSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model =  Event_rule
         fields = ('rule','types','title','impact','urgency','contact')

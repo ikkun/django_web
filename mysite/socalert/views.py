@@ -10,6 +10,7 @@ from django.views.generic import (
 from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets,permissions
+
 from .serializers import Event_alertSerializer,Event_ruleSerializer
 from .models import Event_alert,Event_rule
 from django.contrib.auth.decorators import login_required
@@ -53,6 +54,18 @@ class Event_Rule_UpdateView(LoginRequiredMixin,UpdateView):
         form.instance.updated_by_id = self.request.user.id
         form.instance.updated_at = datetime.now()+timedelta(hours=7)
         return super().form_valid(form)
+
+class Event_Rule_Detail(View):
+    def get(self,request):
+        rule1 = request.GET.get('rule',None)
+        obj = Event_rule.objects.get(rule=rule1)
+        # isIncident1 = request.GET.get('isincident',None)
+        # analyse_by1 = request.user.id    
+
+        ruleobj = [{"rule": obj.rule, "types": obj.types,
+        "title": obj.title, "impact": obj.impact, "urgency": obj.urgency, 
+        "contact": obj.contact}]        
+        return JsonResponse(ruleobj, status=200, safe=False,json_dumps_params={'ensure_ascii': False})
 
 ####Event alert
 class Event_AlertView(LoginRequiredMixin,ListView):
@@ -115,6 +128,8 @@ class Event_AlertView_All(LoginRequiredMixin,ListView):
         context['title']="Event Alert-ALL"
         context.update(nav_count()) 
         return context
+
+
         
 
     
@@ -175,6 +190,8 @@ class Update_Memo(LoginRequiredMixin,View):
         }
         return JsonResponse(data)
 
+
+
 ###Rest api
 class Event_alertViewAPI(viewsets.ModelViewSet):
     queryset = Event_alert.objects.all()
@@ -185,6 +202,7 @@ class Event_alertViewAPI(viewsets.ModelViewSet):
 
 class Event_getRuleViewAPI(viewsets.ModelViewSet):            
     queryset = Event_rule.objects.all()
+    
     serializer_class = Event_ruleSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['rule']

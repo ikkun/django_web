@@ -52,6 +52,7 @@ urlpatterns = [
     
     ###eventrule
     path('socalert/eventrule/',socalert_views.Event_RulesView.as_view(), name='socalert-eventrule'),
+    path('socalert/eventruledetail/',socalert_views.Event_Rule_Detail.as_view(), name='socalert-eventruledetail'),
     path('socalert/eventrule/new/',socalert_views.Event_Rule_CreateView.as_view(),name='socalert-createrule'),
     path('socalert/eventrule/<int:pk>/update/', socalert_views.Event_Rule_UpdateView.as_view(), name='socalert-ruleupdate'),
 
