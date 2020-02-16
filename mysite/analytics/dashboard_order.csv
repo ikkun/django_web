@@ -1,0 +1,11 @@
+id,product_category,payment_method,shipping_cost,unit_price
+1,Books,Credit Card,39,59
+2,Books,Cash,59,199
+3,Cellphones,Credit Card,59,799
+4,Accessories,Credit Card,29,399
+5,Accessories,Cash,49,960
+6,Accessories,Cash,49,960
+7,Books,Cash,19,420
+8,Cellphones,Cash,19,420
+9,Movies,Cash,19,65
+10,Movies,Credit Card,25,55

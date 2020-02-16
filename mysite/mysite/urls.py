@@ -14,6 +14,7 @@ from programming import views as programming_views
 from core import views as core_views
 from secmgr import views as secmgr_views
 from socalert import views as socalert_views
+from analytics import views as analytics_views
 
 urlpatterns = [
     path('', include('blog.urls')),
@@ -55,6 +56,10 @@ urlpatterns = [
     path('socalert/eventruledetail/',socalert_views.Event_Rule_Detail.as_view(), name='socalert-eventruledetail'),
     path('socalert/eventrule/new/',socalert_views.Event_Rule_CreateView.as_view(),name='socalert-createrule'),
     path('socalert/eventrule/<int:pk>/update/', socalert_views.Event_Rule_UpdateView.as_view(), name='socalert-ruleupdate'),
+
+    ###analytics
+    path('analytics/ips/',analytics_views.ips_with_pivot,name='analytics_ips'),
+    path('analytics/ips/data/',analytics_views.ips_pivot_data,name='ips_pivot_data'),
 
     path('api-auth/',include('rest_framework.urls')),
     path('api/token/',TokenObtainPairView.as_view()),

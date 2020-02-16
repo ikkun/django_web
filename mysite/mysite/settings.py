@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'secmgr',
     'socalert',
+    'analytics',
     'todo',
     'tinymce',
     'crispy_forms',
