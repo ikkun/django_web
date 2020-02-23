@@ -59,6 +59,7 @@ urlpatterns = [
 
     ###analytics
     path('analytics/ips/',analytics_views.ips_with_pivot,name='analytics_ips'),
+    path('analytics/ips/map/',analytics_views.ips_map,name='analytics_ips_map'),
     path('analytics/ips/data/',analytics_views.ips_pivot_data,name='ips_pivot_data'),
 
     path('api-auth/',include('rest_framework.urls')),
